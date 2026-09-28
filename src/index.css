@@ -1,3 +1,4 @@
+@import 'maplibre-gl/dist/maplibre-gl.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -14,23 +15,19 @@
     min-height: 100vh;
   }
 
-  /* Custom subtle scrollbar in warm spiritual tones */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+  /* Completely hide scrollbars across all browsers while preserving smooth scrolling */
+  * {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
   }
 
-  ::-webkit-scrollbar-track {
-    background: #FAF8F3;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: #DFC67F;
-    border-radius: 4px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: #B7791F;
+  *::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+    background: transparent;
   }
 }
 
@@ -57,30 +54,37 @@
   0% {
     transform: rotate(-1.5deg);
   }
+
   50% {
     transform: rotate(2deg);
   }
+
   100% {
     transform: rotate(-1.5deg);
   }
 }
 
 @keyframes flameFlicker {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.92;
     transform: scale(1) translateY(0);
     filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.75)) drop-shadow(0 0 20px rgba(234, 88, 12, 0.4));
   }
+
   30% {
     opacity: 1;
     transform: scale(1.06) translateY(-0.5px);
     filter: drop-shadow(0 0 14px rgba(245, 158, 11, 0.9)) drop-shadow(0 0 26px rgba(234, 88, 12, 0.55));
   }
+
   65% {
     opacity: 0.88;
     transform: scale(0.97) translateY(0.5px);
     filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.65)) drop-shadow(0 0 16px rgba(234, 88, 12, 0.35));
   }
+
   85% {
     opacity: 0.96;
     transform: scale(1.03) translateY(-0.2px);
@@ -89,10 +93,13 @@
 }
 
 @keyframes warmGlowPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.6;
     transform: scale(0.96);
   }
+
   50% {
     opacity: 0.85;
     transform: scale(1.08);
@@ -112,7 +119,22 @@
   animation: warmGlowPulse 3.8s ease-in-out infinite;
 }
 
+@keyframes flowDash {
+  from {
+    stroke-dashoffset: 24;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-flow-dash {
+  animation: flowDash 0.8s linear infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
+
   .animate-deepam-sway,
   .animate-flame-flicker,
   .animate-warm-glow {
@@ -121,3 +143,75 @@
   }
 }
 
+/* DevaSetu Dedicated Visible Scrollbar for Temple List */
+.temple-list-scrollbar {
+  scrollbar-width: thin !important;
+  scrollbar-color: #d97706 #f5efe6 !important;
+  scroll-behavior: smooth;
+}
+
+.temple-list-scrollbar::-webkit-scrollbar {
+  display: block !important;
+  width: 7px !important;
+  height: 7px !important;
+  background: #f5efe6 !important;
+}
+
+.temple-list-scrollbar::-webkit-scrollbar-track {
+  background: #f5efe6 !important;
+  border-radius: 9999px !important;
+  box-shadow: inset 0 0 3px rgba(180, 83, 9, 0.08) !important;
+}
+
+.temple-list-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%) !important;
+  border-radius: 9999px !important;
+  border: 1px solid rgba(254, 243, 199, 0.6) !important;
+}
+
+.temple-list-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #d97706 0%, #b45309 100%) !important;
+}
+
+/* DevaSetu MapLibre Popup & Control Styling */
+.maplibregl-popup-content {
+  border-radius: 1rem !important;
+  padding: 12px 14px !important;
+  background: #ffffff !important;
+  border: 1.5px solid rgba(180, 83, 9, 0.3) !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.35), 0 8px 10px -6px rgba(0, 0, 0, 0.25) !important;
+}
+
+.maplibregl-popup-tip {
+  border-top-color: #ffffff !important;
+}
+
+.maplibregl-popup-close-button {
+  top: 8px !important;
+  right: 8px !important;
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 9999px !important;
+  background: rgba(250, 247, 240, 0.9) !important;
+  color: #78350F !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 14px !important;
+  font-weight: bold !important;
+  transition: all 0.15s ease !important;
+}
+
+.maplibregl-popup-close-button:hover {
+  background: #FEF3C7 !important;
+  color: #92400E !important;
+}
+
+.maplibregl-ctrl-group {
+  border-radius: 0.75rem !important;
+  overflow: hidden !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(8px) !important;
+}

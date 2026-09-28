@@ -1,5 +1,0 @@
-export const USER_ROLES = Object.freeze({
-  DEVOTEE: 'DEVOTEE',
-  ADMIN: 'ADMIN',
-  TEMPLE_AUTHORITY: 'TEMPLE_AUTHORITY',
-});

@@ -1,0 +1,51 @@
+/**
+ * DevaSetu Application Route Constants
+ * Strongly-typed paths preserving 100% of application routing contracts.
+ */
+export const ROUTES = {
+  // Public / Devotee routes
+  HOME: '/',
+  PUBLIC_HOME: '/home',
+  DASHBOARD: '/dashboard',
+  TEMPLES: '/temples',
+  TEMPLE_DETAILS: '/temples/:slug',
+  EXPERIENCES: '/experiences',
+  PLAN_YOUR_VISIT: '/plan-your-visit',
+  REGISTER_TEMPLE: '/register-temple',
+  LOGIN: '/login',
+  REGISTER: '/register',
+  PROFILE: '/profile',
+  MY_BOOKINGS: '/my-bookings',
+  BOOKING_DETAILS: '/my-bookings/:id',
+  SAVED_TEMPLES: '/saved-temples',
+  BOOK_SERVICE: '/temples/:slug/book/:serviceId',
+  NOTIFICATIONS: '/notifications',
+  VERIFY_BOOKING: '/booking/verify/:token',
+
+  // Admin routes
+  ADMIN: '/admin',
+  ADMIN_DASHBOARD: '/admin/dashboard',
+  ADMIN_LOGIN: '/admin/login',
+  ADMIN_REGISTRATIONS: '/admin/registrations',
+  ADMIN_TEMPLES: '/admin/temples',
+  ADMIN_CATEGORIES: '/admin/categories',
+  ADMIN_AUTHORITIES: '/admin/authorities',
+  ADMIN_DEVOTEES: '/admin/devotees',
+  ADMIN_BOOKINGS: '/admin/bookings',
+  ADMIN_PAYMENTS: '/admin/payments',
+  ADMIN_FEEDBACK: '/admin/feedback',
+  ADMIN_ANALYTICS: '/admin/analytics',
+  ADMIN_AUDIT: '/admin/audit',
+
+  // Temple Authority routes
+  AUTHORITY: '/authority',
+  AUTHORITY_DASHBOARD: '/authority/dashboard',
+  AUTHORITY_ANNOUNCEMENTS: '/authority/announcements',
+  AUTHORITY_LOGIN: '/authority/login',
+  AUTHORITY_SETTINGS: '/authority/settings',
+  AUTHORITY_CHANGE_PASSWORD: '/authority/change-password',
+} as const;
+
+export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES];
+
+export default ROUTES;
