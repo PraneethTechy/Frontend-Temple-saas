@@ -24,6 +24,7 @@ import { useLogoutMutation } from '../store/api/authApi.js';
 import { clearCredentials } from '../store/slices/authSlice.js';
 import { baseApi } from '../store/api/baseApi.js';
 import templeEmblem from '../assets/devasetu_temple_emblem.png';
+import { FloatingMessageWidget } from '../components/messaging/FloatingMessageWidget.js';
 
 export interface AdminLayoutOutletContext {
   onOpenMobileSidebar: () => void;
@@ -367,6 +368,9 @@ export const AdminLayout = (): ReactElement => {
           <Outlet context={{ onOpenMobileSidebar: () => setMobileOpen(true) }} />
         </main>
       </div>
+
+      {/* Admin Floating Messaging Center */}
+      <FloatingMessageWidget />
     </div>
   );
 };

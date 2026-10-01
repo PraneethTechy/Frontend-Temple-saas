@@ -1,8 +1,8 @@
-import React, { useState, type ReactElement } from 'react';
+import React, { useState, useEffect, useRef, type ReactElement } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Lock, Mail, ArrowRight, AlertCircle, Loader2, Eye, EyeOff } from 'lucide-react';
 import { useAppDispatch } from '../../store/hooks.js';
-import { useLoginMutation } from '../../store/api/authApi.js';
+import { useLoginMutation, useGoogleLoginMutation } from '../../store/api/authApi.js';
 import { setCredentials } from '../../store/slices/authSlice.js';
 import { ROUTES } from '../../constants/routes.js';
 import { USER_ROLES } from '../../constants/roles.js';
@@ -21,11 +21,109 @@ export const Login = (): ReactElement => {
   const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [isGoogleProcessing, setIsGoogleProcessing] = useState<boolean>(false);
 
   const [loginUser, { isLoading }] = useLoginMutation();
+  const [googleLogin, { isLoading: isGoogleApiLoading }] = useGoogleLoginMutation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const googleButtonRef = useRef<HTMLDivElement>(null);
+
+  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+  // Handle Google OAuth Credential response
+  const handleGoogleCredentialResponse = async (response: { credential: string }): Promise<void> => {
+    if (!response.credential) {
+      setErrorMessage('Google authentication credential was not received.');
+      return;
+    }
+
+    setIsGoogleProcessing(true);
+    setErrorMessage('');
+
+    try {
+      const apiRes = await googleLogin({ credential: response.credential }).unwrap();
+      const user = (apiRes.data?.user || (apiRes as unknown as { user: AuthenticatedUser }).user) as AuthenticatedUser;
+
+      dispatch(setCredentials({ user }));
+
+      // Preserve destination if navigating from a protected devotee route
+      const locationState = location.state as LocationState | null;
+      const from = locationState?.from?.pathname;
+      let targetRoute: string = getDefaultRouteForRole(user);
+
+      if (from && !from.includes('/login') && from !== '/unauthorized' && from !== '/') {
+        if (user.role === USER_ROLES.DEVOTEE && !from.startsWith('/admin') && !from.startsWith('/authority')) {
+          targetRoute = from;
+        }
+      }
+
+      navigate(targetRoute, { replace: true });
+    } catch (err: unknown) {
+      const errorObj = err as { data?: { message?: string }; message?: string };
+      setErrorMessage(
+        errorObj?.data?.message || errorObj?.message || 'Google sign-in failed. Please verify credentials or try again.'
+      );
+    } finally {
+      setIsGoogleProcessing(false);
+    }
+  };
+
+  // Initialize Google Identity Services (GIS) button
+  useEffect(() => {
+    if (!clientId) {
+      return;
+    }
+
+    const initGIS = (): boolean => {
+      if (window.google?.accounts?.id && googleButtonRef.current) {
+        try {
+          window.google.accounts.id.initialize({
+            client_id: clientId,
+            callback: handleGoogleCredentialResponse,
+            auto_select: false,
+            cancel_on_tap_outside: true,
+          });
+
+          // Clear prior rendered button to prevent duplication
+          googleButtonRef.current.innerHTML = '';
+
+          window.google.accounts.id.renderButton(googleButtonRef.current, {
+            type: 'standard',
+            theme: 'outline',
+            size: 'large',
+            text: 'continue_with',
+            shape: 'rectangular',
+            logo_alignment: 'left',
+            width: Math.min(384, window.innerWidth - 64),
+          });
+          return true;
+        } catch (err) {
+          console.warn('[GIS Render Failed]:', err);
+          return false;
+        }
+      }
+      return false;
+    };
+
+    if (!initGIS()) {
+      const interval = setInterval(() => {
+        if (initGIS()) {
+          clearInterval(interval);
+        }
+      }, 200);
+
+      const timeout = setTimeout(() => {
+        clearInterval(interval);
+      }, 4000);
+
+      return () => {
+        clearInterval(interval);
+        clearTimeout(timeout);
+      };
+    }
+  }, [clientId]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
@@ -70,6 +168,8 @@ export const Login = (): ReactElement => {
     }
   };
 
+  const isAnyLoading = isLoading || isGoogleProcessing || isGoogleApiLoading;
+
   return (
     <div className="min-h-[75vh] flex items-center justify-center px-4 py-8">
       <div className="spiritual-card p-6 sm:p-8 max-w-md w-full bg-white shadow-spiritual-md border border-spiritual-border">
@@ -110,6 +210,7 @@ export const Login = (): ReactElement => {
                 placeholder="name@example.com"
                 className="spiritual-input pl-9 text-xs"
                 autoComplete="email"
+                disabled={isAnyLoading}
               />
             </div>
           </div>
@@ -128,12 +229,14 @@ export const Login = (): ReactElement => {
                 placeholder="••••••••"
                 className="spiritual-input pl-9 pr-10 text-xs"
                 autoComplete="current-password"
+                disabled={isAnyLoading}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-spiritual-subtle hover:text-spiritual-text transition-colors p-1"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
+                disabled={isAnyLoading}
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -142,7 +245,7 @@ export const Login = (): ReactElement => {
 
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isAnyLoading}
             className="btn-spiritual-primary w-full text-xs py-2.5 flex items-center justify-center gap-2 mt-2 disabled:opacity-60 cursor-pointer"
           >
             {isLoading ? (
@@ -158,6 +261,30 @@ export const Login = (): ReactElement => {
             )}
           </button>
         </form>
+
+        {/* Divider */}
+        <div className="relative my-5">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-spiritual-border" />
+          </div>
+          <div className="relative flex justify-center text-xs">
+            <span className="bg-white px-3 text-spiritual-muted font-medium">OR</span>
+          </div>
+        </div>
+
+        {/* Continue with Google (Devotee Only) */}
+        <div className="w-full flex flex-col items-center">
+          <div
+            ref={googleButtonRef}
+            className={`w-full flex justify-center min-h-[44px] ${isAnyLoading ? 'opacity-50 pointer-events-none' : ''}`}
+          />
+          {(isGoogleProcessing || isGoogleApiLoading) && (
+            <div className="flex items-center gap-2 mt-2.5 text-xs text-spiritual-primary font-medium">
+              <Loader2 className="w-4 h-4 animate-spin text-spiritual-primary" />
+              <span>Authenticating with Google...</span>
+            </div>
+          )}
+        </div>
 
         {/* Footer Navigation */}
         <div className="mt-6 pt-4 border-t border-spiritual-border space-y-2 text-center text-xs text-spiritual-muted">

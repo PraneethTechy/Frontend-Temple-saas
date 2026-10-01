@@ -21,16 +21,29 @@ const TempleThemeMandirIcon: React.FC = () => (
   </svg>
 );
 
-// Refined Sacred Lotus Icon for 'Pooja & Seva' (Balanced w-6 h-6 size)
-const TempleThemeLotusIcon: React.FC = () => (
+// Refined Sacred Experience / Jyoti & Sparkle Icon for 'Discover Experiences' (Balanced w-6 h-6 size)
+const TempleThemeExperienceIcon: React.FC = () => (
   <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none">
-    {/* Central Golden Petal */}
-    <path d="M12 3C12 3 9.2 8.5 9.2 13C9.2 15.8 10.5 17.5 12 17.5C13.5 17.5 14.8 15.8 14.8 13C14.8 8.5 12 3 12 3Z" fill="#BA771E" />
-    {/* Side Petals in Saffron Amber */}
-    <path d="M12 17.5C9.2 17.5 6.8 15.5 6.2 12.5C5.6 9.8 7.2 7.2 8.5 6C8.5 9 9.8 11.5 12 14.8" fill="#D97706" />
-    <path d="M12 17.5C14.8 17.5 17.2 15.5 17.8 12.5C18.4 9.8 16.8 7.2 15.5 6C15.5 9 14.2 11.5 12 14.8" fill="#D97706" />
-    {/* Base Petals in Auspicious Maroon */}
-    <path d="M5.5 16C7.8 18 9.5 19 12 19C14.5 19 16.2 18 18.5 16C16.2 19.5 14.5 20.2 12 20.2C9.5 20.2 7.8 19.5 5.5 16Z" fill="#8C2D19" />
+    {/* Sacred Diya Bowl Base */}
+    <path
+      d="M4.5 13.5C4.5 17 7.8 19.5 12 19.5C16.2 19.5 19.5 17 19.5 13.5H4.5Z"
+      fill="#8C2D19"
+      stroke="#BA771E"
+      strokeWidth="0.8"
+    />
+    <ellipse cx="12" cy="13.5" rx="7.5" ry="1.8" fill="#BA771E" />
+    {/* Radiant Divine Jyoti (Flame) */}
+    <path
+      d="M12 3.5C12 3.5 9.2 7.8 9.2 10.2C9.2 11.8 10.5 13 12 13C13.5 13 14.8 11.8 14.8 10.2C14.8 7.8 12 3.5 12 3.5Z"
+      fill="#D97706"
+    />
+    <path
+      d="M12 6.5C12 6.5 10.5 8.8 10.5 10.2C10.5 11 11.2 11.7 12 11.7C12.8 11.7 13.5 11 13.5 10.2C13.5 8.8 12 6.5 12 6.5Z"
+      fill="#FDE68A"
+    />
+    {/* Devotional Aura Sparkles */}
+    <path d="M5.5 6L6.5 7.5L5.5 9L4.5 7.5L5.5 6Z" fill="#D97706" />
+    <path d="M18.5 6L19.5 7.5L18.5 9L17.5 7.5L18.5 6Z" fill="#D97706" />
   </svg>
 );
 
@@ -104,14 +117,14 @@ export const QuickActionCard: React.FC<QuickActionCardProps> = ({
 
       {/* Bottom Row: Typography Hierarchy & High-Contrast Aligned Arrow Button */}
       <div className="relative z-10 flex items-center justify-between mt-auto pt-3">
-        <div className="flex flex-col min-w-0 pr-1">
+        <div className="flex flex-col min-w-0 flex-1 pr-1">
           <span
-            className="font-bold text-[16px] sm:text-[17px] text-[#1E130E] group-hover:text-[#BA771E] transition-colors leading-snug tracking-tight whitespace-nowrap overflow-visible"
+            className="font-bold text-[15px] sm:text-[16px] text-[#1E130E] group-hover:text-[#BA771E] transition-colors leading-tight tracking-tight line-clamp-1"
             style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
           >
             {title}
           </span>
-          <span className="text-[11.5px] sm:text-[12.5px] text-[#6B5E55] font-normal mt-1 leading-tight truncate max-w-[145px]">
+          <span className="text-[11.5px] sm:text-[12px] text-[#6B5E55] font-normal mt-1 leading-tight line-clamp-1">
             {subtitle}
           </span>
         </div>
@@ -134,10 +147,10 @@ export const QuickActionsSection: React.FC = () => {
       icon: TempleThemeMandirIcon,
     },
     {
-      title: 'Pooja & Seva',
-      subtitle: 'Offer your prayers',
-      to: `${ROUTES.TEMPLES}?serviceType=POOJA`,
-      icon: TempleThemeLotusIcon,
+      title: 'Discover Experiences',
+      subtitle: 'See what devotees experienced',
+      to: ROUTES.EXPERIENCES,
+      icon: TempleThemeExperienceIcon,
     },
     {
       title: 'Plan Your Visit',

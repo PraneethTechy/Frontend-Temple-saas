@@ -29,6 +29,8 @@ export const TAG_TYPES = [
   'VisitPlan',
   'SavedTemple',
   'EligibleBookings',
+  'Message',
+  'Conversation',
 ] as const;
 
 export type TagType = (typeof TAG_TYPES)[number];

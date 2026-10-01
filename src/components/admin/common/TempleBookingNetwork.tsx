@@ -13,6 +13,7 @@ import { useGetTempleWiseBookingsQuery } from '../../../store/api/adminApi.js';
 import { ROUTES } from '../../../constants/routes.js';
 import {
   calculateTempleNodeLayout,
+  getNodePalette,
   type TempleNodeLayoutItem,
 } from '../../../utils/templeBookingLayout.js';
 
@@ -86,9 +87,10 @@ export interface TempleBookingNetworkProps {
 export const TempleBookingNetwork = ({ className = '' }: TempleBookingNetworkProps): ReactElement => {
   const navigate = useNavigate();
   const [range, setRange] = useState<string>('30d');
+  const [viewMode, setViewMode] = useState<'radial' | 'list'>('radial');
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [dimensions, setDimensions] = useState<{ width: number; height: number }>({ width: 960, height: 580 });
+  const [dimensions, setDimensions] = useState<{ width: number; height: number }>({ width: 960, height: 620 });
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState<boolean>(false);
 
@@ -123,7 +125,7 @@ export const TempleBookingNetwork = ({ className = '' }: TempleBookingNetworkPro
         setIsMobile(mobile);
         setDimensions({
           width: w,
-          height: mobile ? 480 : Math.min(640, Math.max(520, Math.floor(w * 0.52))),
+          height: mobile ? 500 : Math.min(680, Math.max(580, Math.floor(w * 0.54))),
         });
       }
     };
@@ -136,21 +138,17 @@ export const TempleBookingNetwork = ({ className = '' }: TempleBookingNetworkPro
     return () => observer.disconnect();
   }, []);
 
-  const centerRadius = isMobile ? 62 : 74;
-  const nodeWidth = isMobile ? 150 : 172;
-  const nodeHeight = isMobile ? 52 : 58;
+  const centerRadius = isMobile ? 56 : 68;
 
-  // Calculate dynamic radial node positions
+  // Calculate dynamic radial node positions with responsive width
   const layoutNodes: TempleNodeLayoutItem<TempleAggregationItem>[] = useMemo(() => {
     return calculateTempleNodeLayout<TempleAggregationItem>({
       temples,
       containerWidth: dimensions.width,
       containerHeight: dimensions.height,
       centerRadius,
-      nodeWidth,
-      nodeHeight,
     });
-  }, [temples, dimensions.width, dimensions.height, centerRadius, nodeWidth, nodeHeight]);
+  }, [temples, dimensions.width, dimensions.height, centerRadius]);
 
   const cx = dimensions.width / 2;
   const cy = dimensions.height / 2;
@@ -187,8 +185,37 @@ export const TempleBookingNetwork = ({ className = '' }: TempleBookingNetworkPro
           </div>
         </div>
 
-        {/* Date Period Selector */}
-        <div className="flex items-center gap-2 self-start sm:self-auto">
+        {/* Date Period Selector & View Mode Switcher */}
+        <div className="flex items-center gap-2.5 self-start sm:self-auto">
+          {/* Radial / List View Toggle Button Group */}
+          <div className="inline-flex items-center rounded-lg border border-spiritual-border p-0.5 bg-spiritual-surface shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setViewMode('radial')}
+              className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
+                viewMode === 'radial'
+                  ? 'bg-white text-spiritual-primary shadow-xs'
+                  : 'text-spiritual-muted hover:text-spiritual-text'
+              }`}
+              title="Radial Network Visualization"
+            >
+              Radial
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('list')}
+              className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
+                viewMode === 'list'
+                  ? 'bg-white text-spiritual-primary shadow-xs'
+                  : 'text-spiritual-muted hover:text-spiritual-text'
+              }`}
+              title="Ranked List View"
+            >
+              List
+            </button>
+          </div>
+
+          {/* Date Period Selector */}
           <div className="relative inline-flex items-center">
             <Calendar className="w-3.5 h-3.5 text-spiritual-muted absolute left-3 pointer-events-none" />
             <select
@@ -265,6 +292,106 @@ export const TempleBookingNetwork = ({ className = '' }: TempleBookingNetworkPro
               No ticket bookings recorded yet for the selected period. Newly confirmed reservations
               will appear dynamically.
             </p>
+          </div>
+        ) : viewMode === 'list' ? (
+          /* Clean Ranked List View for Compact / Alternate Inspection */
+          <div className="p-4 sm:p-5 flex flex-col gap-4 overflow-y-auto max-h-[640px]">
+            {/* Summary Banner */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-gradient-to-r from-amber-500/10 via-amber-50/60 to-orange-500/10 border border-amber-200/80">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-white border border-amber-300 text-amber-700 flex items-center justify-center shadow-xs shrink-0">
+                  <Ticket className="w-6 h-6 text-amber-700" />
+                </div>
+                <div>
+                  <div className="text-2xl font-serif font-bold text-spiritual-text leading-tight">
+                    {totalTickets.toLocaleString('en-IN')}
+                  </div>
+                  <div className="text-xs font-semibold text-spiritual-muted">
+                    Total Tickets Booked
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-amber-800 bg-white/80 px-3 py-1.5 rounded-full border border-amber-200 shadow-2xs">
+                  {temples.length} Temples Tracked
+                </span>
+                <span className="text-xs font-semibold text-spiritual-muted">
+                  {totalBookings} Reservations
+                </span>
+              </div>
+            </div>
+
+            {/* Ranked Temple Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {temples.map((temple, idx) => {
+                const palette = getNodePalette(idx);
+                const rank = temple.rank || idx + 1;
+                const ticketCount = temple.ticketCount ?? temple.bookingCount ?? 0;
+                const percentage = temple.percentage ?? 0;
+                const templeName = temple.templeName || (typeof temple.name === 'string' ? temple.name : `Temple #${rank}`);
+
+                return (
+                  <div
+                    key={temple.templeId || (temple._id ? String(temple._id) : idx)}
+                    onClick={() => {
+                      if (ROUTES.ADMIN_TEMPLES) navigate(ROUTES.ADMIN_TEMPLES);
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    className="relative flex items-center gap-3 p-3 rounded-xl border transition-all duration-200 bg-white hover:shadow-spiritual-xs cursor-pointer group"
+                    style={{
+                      borderColor: palette.border,
+                      backgroundColor: palette.bg,
+                    }}
+                  >
+                    {/* Rank Badge */}
+                    <div
+                      className="w-6 h-6 rounded-full text-white text-[11px] font-bold flex items-center justify-center shrink-0 shadow-xs"
+                      style={{ backgroundColor: palette.badgeBg }}
+                    >
+                      {rank}
+                    </div>
+
+                    {/* Thumbnail */}
+                    <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-spiritual-border/60 bg-white flex items-center justify-center">
+                      {temple.image ? (
+                        <img
+                          src={temple.image}
+                          alt=""
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            const sibling = e.currentTarget.nextElementSibling as HTMLElement | null;
+                            if (sibling) sibling.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <div
+                        className="w-full h-full items-center justify-center"
+                        style={{ display: temple.image ? 'none' : 'flex' }}
+                      >
+                        <TempleGopuramIcon color={palette.accent} className="w-5 h-5" />
+                      </div>
+                    </div>
+
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-bold text-spiritual-text group-hover:text-spiritual-primary transition-colors truncate">
+                        {templeName}
+                      </div>
+                      <div className="flex items-center justify-between text-[11px] text-spiritual-muted mt-0.5">
+                        <span>
+                          {ticketCount} {ticketCount === 1 ? 'booking' : 'bookings'}
+                        </span>
+                        <span className="font-bold" style={{ color: palette.textAccent }}>
+                          {percentage}%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         ) : (
           <>
@@ -455,8 +582,8 @@ export const TempleBookingNetwork = ({ className = '' }: TempleBookingNetworkPro
                   <div
                     className="relative flex items-center gap-2.5 px-3 py-2 rounded-2xl bg-white transition-all duration-200"
                     style={{
-                      width: `${node.nodeWidth || nodeWidth}px`,
-                      minHeight: `${node.nodeHeight || nodeHeight}px`,
+                      width: `${node.nodeWidth || 196}px`,
+                      minHeight: `${node.nodeHeight || 48}px`,
                       border: `1.5px solid ${isHovered ? palette.accent : palette.border}`,
                       backgroundColor: palette.bg,
                       boxShadow: isHovered

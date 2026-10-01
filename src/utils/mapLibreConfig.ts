@@ -1,4 +1,11 @@
 import type { StyleSpecification } from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
+import maplibreglWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
+
+// Configure MapLibre Web Worker URL for Vite environment (dev & prod)
+if (typeof window !== 'undefined' && typeof (maplibregl as any).setWorkerUrl === 'function') {
+  (maplibregl as any).setWorkerUrl(maplibreglWorkerUrl);
+}
 
 /**
  * Retrieves the MapTiler API key from the Vite frontend environment.

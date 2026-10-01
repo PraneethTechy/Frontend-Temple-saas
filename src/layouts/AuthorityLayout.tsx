@@ -26,6 +26,7 @@ import { clearCredentials } from '../store/slices/authSlice.js';
 import { baseApi } from '../store/api/baseApi.js';
 import { useGetAuthorityTempleQuery } from '../store/api/authorityApi.js';
 import templeEmblem from '../assets/devasetu_temple_emblem.png';
+import { FloatingMessageWidget } from '../components/messaging/FloatingMessageWidget.js';
 
 export interface AuthorityLayoutOutletContext {
   onOpenMobileSidebar: () => void;
@@ -451,6 +452,9 @@ export const AuthorityLayout = (): ReactElement => {
           <Outlet context={{ onOpenMobileSidebar: () => setMobileOpen(true) }} />
         </main>
       </div>
+
+      {/* Temple Authority Floating Messaging Center */}
+      <FloatingMessageWidget />
     </div>
   );
 };

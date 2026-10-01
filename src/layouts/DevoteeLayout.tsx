@@ -14,11 +14,7 @@ export const DevoteeLayout = (): ReactElement => {
   const isPlanYourVisit = location.pathname === ROUTES.PLAN_YOUR_VISIT;
 
   return (
-    <div
-      className={`min-h-screen flex flex-col bg-spiritual-bg text-spiritual-text overflow-x-hidden ${
-        isPlanYourVisit ? 'lg:h-screen lg:overflow-hidden' : ''
-      }`}
-    >
+    <div className="min-h-screen flex flex-col bg-spiritual-bg text-spiritual-text overflow-x-hidden">
       {/* Devotee Horizontal Navbar */}
       <DevoteeNavbar />
 
@@ -28,7 +24,7 @@ export const DevoteeLayout = (): ReactElement => {
           <Outlet />
         </main>
       ) : isPlanYourVisit ? (
-        <main className="flex-1 w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-3 lg:overflow-hidden flex flex-col min-h-0">
+        <main className="flex-1 w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           <Outlet />
         </main>
       ) : (
@@ -37,8 +33,8 @@ export const DevoteeLayout = (): ReactElement => {
         </main>
       )}
 
-      {/* Devotee Trust Strip & Footer (Rendered here for all pages; for PlanYourVisit on desktop, it sits within the scrollable right workspace) */}
-      {!isPlanYourVisit && <DevoteeFooter />}
+      {/* Devotee Trust Strip & Full-Width Footer */}
+      <DevoteeFooter />
     </div>
   );
 };

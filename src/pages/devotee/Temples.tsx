@@ -5,8 +5,6 @@ import {
   MapPin,
   Clock,
   Building2,
-  ChevronLeft,
-  ChevronRight,
   Sparkles,
   ArrowRight,
   AlertCircle,
@@ -54,8 +52,8 @@ export interface TempleFilterState {
   category: string;
   serviceType: string;
   sort: string;
-  page: number;
-  limit: number;
+  page?: number;
+  limit?: number;
 }
 
 interface CustomGalleryItem {
@@ -100,7 +98,6 @@ export const Temples: React.FC = () => {
   const initialCategory = searchParams.get('category') || '';
   const initialServiceType = searchParams.get('serviceType') || '';
   const initialSort = searchParams.get('sort') || 'newest';
-  const initialPage = parseInt(searchParams.get('page') || '1', 10) || 1;
 
   const [searchInput, setSearchInput] = useState(initialSearch);
   const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid');
@@ -114,8 +111,7 @@ export const Temples: React.FC = () => {
     category: initialCategory,
     serviceType: initialServiceType,
     sort: initialSort,
-    page: initialPage,
-    limit: 9,
+    limit: 100,
   });
 
   useEffect(() => {
@@ -130,7 +126,6 @@ export const Temples: React.FC = () => {
       city: c,
       category: cat,
       serviceType: srv,
-      page: parseInt(searchParams.get('page') || '1', 10) || 1,
     }));
   }, [searchParams]);
 
@@ -160,7 +155,6 @@ export const Temples: React.FC = () => {
   const [unsaveTempleMutation] = useUnsaveTempleMutation();
 
   const temples: Temple[] = response?.data?.items || [];
-  const pagination = response?.data?.pagination || { page: 1, limit: 9, total: 0, totalPages: 1 };
 
   const updateUrlParams = (currentFilters: TempleFilterState) => {
     const params: Record<string, string> = {};
@@ -171,26 +165,25 @@ export const Temples: React.FC = () => {
     if (currentFilters.category) params.category = currentFilters.category;
     if (currentFilters.serviceType) params.serviceType = currentFilters.serviceType;
     if (currentFilters.sort && currentFilters.sort !== 'newest') params.sort = currentFilters.sort;
-    if (currentFilters.page > 1) params.page = String(currentFilters.page);
     setSearchParams(params);
   };
 
   const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const newFilters = { ...filters, search: searchInput.trim(), page: 1 };
+    const newFilters = { ...filters, search: searchInput.trim() };
     setFilters(newFilters);
     updateUrlParams(newFilters);
   };
 
   const handleFilterChange = (key: keyof TempleFilterState, value: string | number) => {
-    const newFilters = { ...filters, [key]: value, page: 1 };
+    const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
     updateUrlParams(newFilters);
   };
 
   const handlePopularPillClick = (pillId: string) => {
     if (pillId === 'All') {
-      const newFilters = { ...filters, search: '', category: '', page: 1 };
+      const newFilters = { ...filters, search: '', category: '' };
       setSearchInput('');
       setFilters(newFilters);
       updateUrlParams(newFilters);
@@ -220,19 +213,10 @@ export const Temples: React.FC = () => {
       category: '',
       serviceType: '',
       sort: 'newest',
-      page: 1,
-      limit: 9,
+      limit: 100,
     };
     setFilters(resetFilters);
     setSearchParams({});
-  };
-
-  const handlePageChange = (newPage: number) => {
-    if (newPage < 1 || newPage > pagination.totalPages) return;
-    const newFilters = { ...filters, page: newPage };
-    setFilters(newFilters);
-    updateUrlParams(newFilters);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const toggleFavorite = async (e: React.MouseEvent<HTMLButtonElement>, templeId: string) => {
@@ -635,8 +619,7 @@ export const Temples: React.FC = () => {
       {/* ────────────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between px-1">
         <p className="text-xs sm:text-sm text-stone-500 font-medium">
-          Showing <span className="font-bold text-stone-900">{temples.length}</span> of{' '}
-          <span className="font-bold text-stone-900">{pagination.total}</span> active shrines
+          Showing <span className="font-bold text-stone-900">{temples.length}</span> active shrines
         </p>
 
         <div className="flex items-center gap-2">
@@ -1033,37 +1016,6 @@ export const Temples: React.FC = () => {
         </div>
       )}
 
-      {/* ────────────────────────────────────────────────────────── */}
-      {/* 7. PAGINATION CONTROLS                                     */}
-      {/* ────────────────────────────────────────────────────────── */}
-      {!isLoading && !isError && pagination.totalPages > 1 && (
-        <div className="flex items-center justify-between border-t border-stone-200 pt-6 mt-8">
-          <button
-            type="button"
-            onClick={() => handlePageChange(pagination.page - 1)}
-            disabled={pagination.page <= 1}
-            className="px-4 py-2 bg-white border border-stone-200 rounded-xl text-xs font-semibold text-stone-700 hover:bg-stone-50 disabled:opacity-40 disabled:pointer-events-none flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
-          >
-            <ChevronLeft className="w-4 h-4" /> Previous
-          </button>
-
-          <div className="flex items-center gap-1 text-xs">
-            <span className="text-stone-400 font-medium">Page</span>
-            <span className="font-bold text-[#B45309]">{pagination.page}</span>
-            <span className="text-stone-400 font-medium">of</span>
-            <span className="font-bold text-stone-800">{pagination.totalPages}</span>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => handlePageChange(pagination.page + 1)}
-            disabled={pagination.page >= pagination.totalPages}
-            className="px-4 py-2 bg-white border border-stone-200 rounded-xl text-xs font-semibold text-stone-700 hover:bg-stone-50 disabled:opacity-40 disabled:pointer-events-none flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
-          >
-            Next <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      )}
     </div>
   );
 };

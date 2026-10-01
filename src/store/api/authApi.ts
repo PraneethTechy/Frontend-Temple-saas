@@ -26,6 +26,14 @@ export const authApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['Auth', 'User'],
     }),
+    googleLogin: builder.mutation<ApiResponse<AuthSessionResponse>, { credential: string }>({
+      query: (body) => ({
+        url: '/auth/google',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Auth', 'User'],
+    }),
     getMe: builder.query<ApiResponse<{ user: AuthenticatedUser }>, void>({
       query: () => '/auth/me',
       providesTags: ['Auth', 'User'],
@@ -51,6 +59,7 @@ export const authApi = baseApi.injectEndpoints({
 export const {
   useRegisterMutation,
   useLoginMutation,
+  useGoogleLoginMutation,
   useGetMeQuery,
   useLazyGetMeQuery,
   useLogoutMutation,
