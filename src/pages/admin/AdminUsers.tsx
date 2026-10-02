@@ -192,7 +192,7 @@ export const AdminUsers = (): ReactElement => {
       )}
 
       {/* Users Table */}
-      <div className="bg-white rounded-2xl border border-spiritual-border shadow-spiritual-xs overflow-hidden">
+      <div className="bg-white rounded-2xl border border-spiritual-border shadow-spiritual-xs overflow-hidden w-full min-w-0 max-w-full flex flex-col">
         {isLoading ? (
           <div className="p-6 space-y-3">
             {[1, 2, 3, 4, 5].map((n) => (
@@ -215,17 +215,17 @@ export const AdminUsers = (): ReactElement => {
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
+            <div className="overflow-x-auto w-full min-w-0 table-scrollbar">
+              <table className="w-full min-w-[850px] text-left text-xs border-collapse">
                 <thead className="bg-spiritual-surface/60 text-spiritual-muted uppercase text-[10px] tracking-wider border-b border-spiritual-border">
                   <tr>
-                    <th className="px-6 py-3.5 font-semibold">User</th>
-                    <th className="px-6 py-3.5 font-semibold">Contact</th>
-                    <th className="px-6 py-3.5 font-semibold">Role</th>
-                    <th className="px-6 py-3.5 font-semibold">Status</th>
-                    <th className="px-6 py-3.5 font-semibold">Registered</th>
-                    <th className="px-6 py-3.5 font-semibold">Last Login</th>
-                    <th className="px-6 py-3.5 font-semibold text-right">Action</th>
+                    <th className="px-6 py-3.5 font-semibold whitespace-nowrap">User</th>
+                    <th className="px-6 py-3.5 font-semibold whitespace-nowrap">Contact</th>
+                    <th className="px-6 py-3.5 font-semibold whitespace-nowrap">Role</th>
+                    <th className="px-6 py-3.5 font-semibold whitespace-nowrap">Status</th>
+                    <th className="px-6 py-3.5 font-semibold whitespace-nowrap">Registered</th>
+                    <th className="px-6 py-3.5 font-semibold whitespace-nowrap">Last Login</th>
+                    <th className="px-6 py-3.5 font-semibold whitespace-nowrap text-right">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-spiritual-border text-spiritual-text">

@@ -359,18 +359,18 @@ export const AdminCategories: React.FC = () => {
               </button>
             </div>
           ) : (
-            <div className="bg-white rounded-2xl border border-spiritual-border shadow-spiritual-xs overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-spiritual-surface border-b border-spiritual-border text-spiritual-muted uppercase font-semibold">
+            <div className="bg-white rounded-2xl border border-spiritual-border shadow-spiritual-xs overflow-hidden w-full min-w-0 max-w-full flex flex-col">
+              <div className="overflow-x-auto w-full min-w-0 table-scrollbar">
+                <table className="w-full min-w-[850px] text-left text-xs border-collapse">
+                  <thead className="bg-spiritual-surface border-b border-spiritual-border text-spiritual-muted uppercase font-semibold text-[10px] tracking-wider">
                     <tr>
-                      <th className="py-3 px-4">Category Name</th>
-                      <th className="py-3 px-4">Slug</th>
-                      <th className="py-3 px-4">Description</th>
-                      <th className="py-3 px-4 text-center">Assigned Temples</th>
-                      <th className="py-3 px-4 text-center">Status</th>
-                      <th className="py-3 px-4 text-center">Order</th>
-                      <th className="py-3 px-4 text-right">Actions</th>
+                      <th className="py-3 px-4 whitespace-nowrap">Category Name</th>
+                      <th className="py-3 px-4 whitespace-nowrap">Slug</th>
+                      <th className="py-3 px-4 whitespace-nowrap">Description</th>
+                      <th className="py-3 px-4 text-center whitespace-nowrap">Assigned Temples</th>
+                      <th className="py-3 px-4 text-center whitespace-nowrap">Status</th>
+                      <th className="py-3 px-4 text-center whitespace-nowrap">Order</th>
+                      <th className="py-3 px-4 text-right whitespace-nowrap">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-spiritual-borderLight">
@@ -485,17 +485,17 @@ export const AdminCategories: React.FC = () => {
               </p>
             </div>
           ) : (
-            <div className="bg-white rounded-2xl border border-spiritual-border shadow-spiritual-xs overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-spiritual-surface border-b border-spiritual-border text-spiritual-muted uppercase font-semibold">
+            <div className="bg-white rounded-2xl border border-spiritual-border shadow-spiritual-xs overflow-hidden w-full min-w-0 max-w-full flex flex-col">
+              <div className="overflow-x-auto w-full min-w-0 table-scrollbar">
+                <table className="w-full min-w-[850px] text-left text-xs border-collapse">
+                  <thead className="bg-spiritual-surface border-b border-spiritual-border text-spiritual-muted uppercase font-semibold text-[10px] tracking-wider">
                     <tr>
-                      <th className="py-3 px-4">Suggested Category</th>
-                      <th className="py-3 px-4">Temple Name</th>
-                      <th className="py-3 px-4">Submitted By</th>
-                      <th className="py-3 px-4">Description</th>
-                      <th className="py-3 px-4 text-center">Status</th>
-                      <th className="py-3 px-4 text-right">Actions</th>
+                      <th className="py-3 px-4 whitespace-nowrap">Suggested Category</th>
+                      <th className="py-3 px-4 whitespace-nowrap">Temple Name</th>
+                      <th className="py-3 px-4 whitespace-nowrap">Submitted By</th>
+                      <th className="py-3 px-4 whitespace-nowrap">Description</th>
+                      <th className="py-3 px-4 text-center whitespace-nowrap">Status</th>
+                      <th className="py-3 px-4 text-right whitespace-nowrap">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-spiritual-borderLight">

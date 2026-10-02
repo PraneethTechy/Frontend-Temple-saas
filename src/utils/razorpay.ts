@@ -57,8 +57,32 @@ export const loadRazorpayScript = (): Promise<boolean> => {
 
     const existingScript = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
     if (existingScript) {
-      existingScript.addEventListener('load', () => resolve(true));
-      existingScript.addEventListener('error', () => resolve(false));
+      if (window.Razorpay) {
+        resolve(true);
+        return;
+      }
+
+      // Check with interval in case script has already loaded
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
+        if (window.Razorpay) {
+          clearInterval(interval);
+          resolve(true);
+        } else if (attempts > 30) {
+          clearInterval(interval);
+          resolve(false);
+        }
+      }, 100);
+
+      existingScript.addEventListener('load', () => {
+        clearInterval(interval);
+        resolve(true);
+      });
+      existingScript.addEventListener('error', () => {
+        clearInterval(interval);
+        resolve(false);
+      });
       return;
     }
 

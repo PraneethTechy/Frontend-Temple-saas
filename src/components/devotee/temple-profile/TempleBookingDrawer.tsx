@@ -385,17 +385,9 @@ export const TempleBookingDrawer: React.FC<TempleBookingDrawerProps> = ({
       const resData = res.data as unknown as ConfirmedBookingData;
       const createdBooking = resData.booking;
 
-      // 2. Free Offering (₹0): confirm directly
-      if (!createdBooking.totalAmount || createdBooking.totalAmount === 0) {
-        setConfirmedBookingData(resData);
-        setStep(6);
-        setIsProcessingPayment(false);
-        return;
-      }
-
-      // 3. Load Razorpay Checkout SDK dynamically
+      // 2. Load Razorpay Checkout SDK dynamically
       const scriptLoaded = await loadRazorpayScript();
-      if (!scriptLoaded) {
+      if (!scriptLoaded && !window.Razorpay) {
         setIsProcessingPayment(false);
         setErrorMessage('Unable to load payment gateway. Please check your network and try again.');
         return;
@@ -405,28 +397,33 @@ export const TempleBookingDrawer: React.FC<TempleBookingDrawerProps> = ({
       const orderRes = await createPaymentOrder({
         bookingId: createdBooking._id,
       }).unwrap();
-      const orderData = orderRes.data as unknown as PaymentOrderData;
+      const orderData = ((orderRes as { data?: PaymentOrderData })?.data || orderRes) as unknown as PaymentOrderData;
+
+      const razorpayKey =
+        orderData?.keyId ||
+        (import.meta.env.VITE_RAZORPAY_KEY_ID as string) ||
+        'rzp_test_TexQgtetbDmhZi';
 
       // 5. Open Razorpay modal
       const options: RazorpayCheckoutOptions = {
-        key: orderData.keyId,
-        amount: orderData.amount,
-        currency: orderData.currency || 'INR',
+        key: razorpayKey,
+        amount: orderData?.amount || (createdBooking.totalAmount * 100),
+        currency: orderData?.currency || 'INR',
         name: 'DevaSetu',
         description: `${activeService.name} • ${temple.name}`,
-        order_id: orderData.orderId,
+        order_id: orderData?.orderId,
         prefill: {
-          name: orderData.devoteeName || user?.name || '',
-          email: orderData.devoteeEmail || user?.email || '',
-          contact: orderData.devoteePhone || user?.phone || '',
+          name: orderData?.devoteeName || devotees[0]?.name || user?.name || '',
+          email: orderData?.devoteeEmail || user?.email || '',
+          contact: orderData?.devoteePhone || user?.phone || '',
         },
         theme: {
-          color: '#800020', // Sacred Maroon
+          color: '#B45309', // Spiritual saffron
         },
         modal: {
           ondismiss: () => {
             setIsProcessingPayment(false);
-            setErrorMessage('Payment was cancelled. Your booking has not been confirmed.');
+            setErrorMessage('Payment was cancelled. Your booking has not been confirmed. You can retry when ready.');
           },
         },
         handler: async (paymentResponse: RazorpaySuccessResponse) => {
@@ -439,7 +436,7 @@ export const TempleBookingDrawer: React.FC<TempleBookingDrawerProps> = ({
               razorpaySignature: paymentResponse.razorpay_signature,
             }).unwrap();
 
-            const verifyData = verifyRes.data as unknown as VerifyPaymentResponseData;
+            const verifyData = ((verifyRes as { data?: VerifyPaymentResponseData })?.data || verifyRes) as unknown as VerifyPaymentResponseData;
 
             setConfirmedBookingData({
               ...resData,
@@ -476,6 +473,7 @@ export const TempleBookingDrawer: React.FC<TempleBookingDrawerProps> = ({
         setErrorMessage(failDesc);
       });
 
+      setIsProcessingPayment(false);
       razorpayInstance.open();
     } catch (err: unknown) {
       setIsProcessingPayment(false);
@@ -498,6 +496,7 @@ export const TempleBookingDrawer: React.FC<TempleBookingDrawerProps> = ({
   if (!isOpen) return null;
 
   const totalAmount = (activeService?.price || 0) * quantity;
+  const payableAmount = totalAmount > 0 ? totalAmount : 1;
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
@@ -1104,15 +1103,21 @@ export const TempleBookingDrawer: React.FC<TempleBookingDrawerProps> = ({
                 <div className="space-y-1.5 pt-1">
                   <div className="flex items-center justify-between text-stone-600">
                     <span>Offering Fee (₹{activeService?.price || 0} × {quantity})</span>
-                    <span>₹{totalAmount}</span>
+                    <span>{totalAmount === 0 ? 'Free' : `₹${totalAmount}`}</span>
                   </div>
+                  {totalAmount === 0 && (
+                    <div className="flex items-center justify-between text-stone-600">
+                      <span>Devotee Offering (Razorpay Demo Token)</span>
+                      <span className="font-semibold text-amber-700">₹1</span>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between text-stone-600">
                     <span>Convenience / DevaSetu Platform Fee</span>
                     <span className="text-emerald-700 font-semibold">Free</span>
                   </div>
                   <div className="flex items-center justify-between text-sm font-bold text-stone-800 pt-2 border-t border-amber-100">
                     <span>Total Payable</span>
-                    <span className="font-serif text-lg text-amber-700">₹{totalAmount}</span>
+                    <span className="font-serif text-lg text-amber-700">₹{payableAmount}</span>
                   </div>
                 </div>
               </div>
@@ -1364,7 +1369,7 @@ export const TempleBookingDrawer: React.FC<TempleBookingDrawerProps> = ({
                 ) : (
                   <>
                     <CreditCard className="w-4 h-4" />
-                    <span>{totalAmount === 0 ? 'Confirm Free Booking' : `Pay ₹${totalAmount} via Razorpay`}</span>
+                    <span>Pay ₹{payableAmount} with Razorpay</span>
                   </>
                 )}
               </button>

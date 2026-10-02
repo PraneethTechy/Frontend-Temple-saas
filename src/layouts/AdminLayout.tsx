@@ -110,7 +110,7 @@ export const AdminLayout = (): ReactElement => {
   ];
 
   return (
-    <div className="min-h-screen bg-spiritual-bg text-spiritual-text">
+    <div className="min-h-screen bg-spiritual-bg text-spiritual-text w-full max-w-full overflow-x-hidden">
       {/* Mobile Drawer Backdrop */}
       {mobileOpen && (
         <div
@@ -360,11 +360,11 @@ export const AdminLayout = (): ReactElement => {
 
       {/* Main Content Area (Stationary Sidebar, Independent Page Scrolling) */}
       <div
-        className={`min-h-screen flex flex-col transition-[margin] duration-200 ease-in-out ${
-          isCollapsed ? 'lg:ml-[76px]' : 'lg:ml-[260px]'
+        className={`min-h-screen flex flex-col min-w-0 w-full max-w-full transition-[margin,width] duration-200 ease-in-out ${
+          isCollapsed ? 'lg:ml-[76px] lg:w-[calc(100%-76px)]' : 'lg:ml-[260px] lg:w-[calc(100%-260px)]'
         }`}
       >
-        <main className="flex-1 p-6 sm:p-8 max-w-[1600px] w-full mx-auto">
+        <main className="flex-1 min-w-0 w-full p-6 sm:p-8 max-w-[1600px] mx-auto">
           <Outlet context={{ onOpenMobileSidebar: () => setMobileOpen(true) }} />
         </main>
       </div>

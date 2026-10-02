@@ -45,7 +45,7 @@ export const InternalDataTable = <T extends Record<string, unknown>>({
 
   return (
     <div
-      className={`bg-white rounded-2xl border border-spiritual-border shadow-spiritual-xs overflow-hidden flex flex-col ${className}`}
+      className={`bg-white rounded-2xl border border-spiritual-border shadow-spiritual-xs overflow-hidden flex flex-col w-full min-w-0 max-w-full ${className}`}
     >
       {/* Table Body Area */}
       {isLoading ? (
@@ -73,14 +73,14 @@ export const InternalDataTable = <T extends Record<string, unknown>>({
           )}
         </div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
+        <div className="overflow-x-auto w-full min-w-0 table-scrollbar">
+          <table className="w-full min-w-[850px] text-left text-xs border-collapse">
             <thead className="bg-spiritual-surface/60 text-spiritual-muted uppercase text-[10px] tracking-wider border-b border-spiritual-border">
               <tr>
                 {columns.map((col, idx) => (
                   <th
                     key={col.key || idx}
-                    className={`px-5 py-3.5 font-semibold select-none ${
+                    className={`px-5 py-3.5 font-semibold select-none whitespace-nowrap ${
                       col.align === 'right'
                         ? 'text-right'
                         : col.align === 'center'
