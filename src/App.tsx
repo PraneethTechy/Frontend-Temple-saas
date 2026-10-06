@@ -5,6 +5,7 @@ import { setAppInitialized } from './store/slices/uiSlice.js';
 import { setCredentials, setInitializing } from './store/slices/authSlice.js';
 import { useGetMeQuery } from './store/api/authApi.js';
 import AppSplashScreen from './components/common/AppSplashScreen';
+import ScrollToTop from './components/common/ScrollToTop';
 import AppRoutes from './routes/AppRoutes';
 import type { User } from '@shared/types/index.js';
 
@@ -71,6 +72,9 @@ export const App: React.FC = () => {
 
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      {/* Route-level automatic scroll reset */}
+      <ScrollToTop />
+
       {/* Global Splash Initialization Screen */}
       <AppSplashScreen
         isVisible={showSplash}

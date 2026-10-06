@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { AlertCircle } from 'lucide-react';
 import {
@@ -55,6 +55,13 @@ export interface TempleDetailData extends Omit<Temple, 'categories'> {
 
 export const TempleDetails: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
+
+  // Ensure temple profile always opens cleanly from the top
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [slug]);
 
   // 1. Fetch Temple Details by Slug
   const {
